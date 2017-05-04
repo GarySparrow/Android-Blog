@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.gary.blog">
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/app_icon"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:name=".MyApplication"
+        android:theme="@style/AppBaseTheme"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:replace="android:icon, android:theme">
+
+        <activity android:name=".Activity.LaunchActivity"
+            android:theme="@style/AppBaseTheme"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <activity android:name="com.gary.blog.Activity.MainActivity"
+            android:theme="@style/AppBaseTheme"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity android:name="com.gary.blog.Activity.LoginActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppBaseTheme"
+            android:parentActivityName="com.gary.blog.Activity.MainActivity">
+
+        </activity>
+
+        <activity android:name="com.gary.blog.Activity.PostActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/PostActivityTheme"
+            android:parentActivityName="com.gary.blog.Activity.MainActivity">
+        </activity>
+
+        <activity android:name="com.gary.blog.Activity.WritePostActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppBaseTheme"
+            android:parentActivityName="com.gary.blog.Activity.MainActivity">
+        </activity>
+
+        <activity android:name=".Activity.UserInfoActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppBaseTheme"
+            android:parentActivityName="com.gary.blog.Activity.MainActivity">
+        </activity>
+
+        <activity android:name=".Activity.ImageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppBaseTheme"
+            android:parentActivityName=".Activity.MainActivity">
+
+        </activity>
+
+        <activity android:name=".Activity.RegisterActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppBaseTheme"
+            android:parentActivityName=".Activity.LoginActivity">
+
+        </activity>
+    </application>
+
+</manifest>

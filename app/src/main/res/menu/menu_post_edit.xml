@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!--<item android:icon="@android:drawable/arrow_up_float"-->
+        <!--android:id="@+id/upload_video"-->
+        <!--android:title="上传视频"-->
+        <!--app:showAsAction="always"></item>-->
+
+    <item android:icon="@drawable/post"
+        android:id="@+id/edit_done"
+        android:title="完成"
+        app:showAsAction="always">
+    </item>
+
+    <!--<item android:icon="@android:drawable/presence_video_away"-->
+        <!--android:id="@+id/video_mark"-->
+        <!--android:title="视频"-->
+        <!--android:visible="false"-->
+        <!--app:showAsAction="always"></item>-->
+</menu>
