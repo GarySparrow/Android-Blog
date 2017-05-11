@@ -25,9 +25,11 @@ import android.widget.TextView;
 
 import com.dou361.ijkplayer.widget.PlayerView;
 import com.gary.blog.Activity.PostActivity;
+import com.gary.blog.Constant;
 import com.gary.blog.Data.DataManager;
 import com.gary.blog.Data.Post;
 import com.gary.blog.Data.User;
+import com.gary.blog.Interface.onRefreshListener;
 import com.gary.blog.R;
 import com.gary.blog.Utils.ACache;
 import com.gary.blog.Utils.JsonUtil;
@@ -37,23 +39,31 @@ import com.gary.blog.Wedgit.CircleImage;
 import com.gary.blog.Wedgit.MyRecyclerView;
 import com.gary.blog.Wedgit.MyRefreshLayout;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.sackcentury.shinebuttonlib.ShineButton;
 
 import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static com.gary.blog.Constant.Posts;
+import static com.gary.blog.Constant.ISLIKED;
+import static com.gary.blog.Constant.LIKE;
+import static com.gary.blog.Constant.LIKE_COUNT;
+import static com.gary.blog.Constant.POSTS;
+import static com.gary.blog.Constant.UNLIKE;
+import static com.gary.blog.Constant.psdf;
+import static com.gary.blog.Constant.sdf;
 
 /**
  * Created by hasee on 2016/12/9.
  */
 
-public class PostsFragment extends Fragment{
+public class PostsFragment extends Fragment implements onRefreshListener {
 
 //    private static PostsFragment postsFragment;
 
@@ -108,6 +118,18 @@ public class PostsFragment extends Fragment{
 //        if (postsFragment == null) return new PostsFragment();
 //        return postsFragment;
 //    }
+
+
+    @Override
+    public void onRefresh() {
+        refreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                refreshListener.onRefresh();
+            }
+
+        });
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -203,7 +225,7 @@ public class PostsFragment extends Fragment{
 //                            Toast.LENGTH_SHORT);
 //                } else {
                 if (NetWorkUtil.isNetWorkOpened(getContext())) {
-                    BaseClient.get(Posts, null, new JsonHttpResponseHandler() {
+                    BaseClient.get(POSTS, null, new JsonHttpResponseHandler() {
                         @Override
                         public void onStart() {
                             super.onStart();
@@ -320,11 +342,13 @@ public class PostsFragment extends Fragment{
         private FrameLayout hintLayout;
         private ImageView imgFirst;
         private LinearLayout dataLayout;
+        private ShineButton likeState;
 //        private IjkVideoView video;
         private PlayerView video;
         private RelativeLayout videoView;
-        private TextView postSubject, posterName, postDate, posterLoc, hintText;
+        private TextView postSubject, posterName, postDate, posterLoc, hintText, likeSum;
         private CircleImage posterIcon;
+        private boolean mliked;
         private Post post;
 
 //        private Handler holderHandler = new Handler() {
@@ -349,6 +373,8 @@ public class PostsFragment extends Fragment{
             imgFirst = (ImageView) itemView.findViewById(R.id.img_first);
             hintLayout = (FrameLayout) itemView.findViewById(R.id.hint_layout);
             hintText = (TextView) itemView.findViewById(R.id.hint_text);
+            likeState = (ShineButton) itemView.findViewById(R.id.like_state);
+            likeSum = (TextView) itemView.findViewById(R.id.like_sum);
 //            videoView = (RelativeLayout) itemView.findViewById(R.id.player_view);
             dataLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -360,14 +386,112 @@ public class PostsFragment extends Fragment{
                     startActivity(intent);
                 }
             });
+
+            likeState.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (Constant.user == null) {
+                        return ;
+                    }
+                    final RequestParams params = new RequestParams();
+                    params.put("user_id", Constant.user.getId());
+                    if (mliked) {
+                        BaseClient.post(POSTS + post.getId() + UNLIKE, params, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                super.onSuccess(statusCode, headers, response);
+                                mliked = false;
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                super.onFailure(statusCode, headers, responseString, throwable);
+                            }
+
+                            @Override
+                            public void onFinish() {
+                                super.onFinish();
+
+                                BaseClient.get(POSTS + post.getId() + LIKE_COUNT, params, new JsonHttpResponseHandler() {
+                                    int sum = 0;
+
+                                    @Override
+                                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                        super.onSuccess(statusCode, headers, response);
+
+                                        try {
+                                            sum = JsonUtil.getEntity(response.getString("count"), Integer.class);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                        likeSum.setText(String.valueOf(sum));
+                                    }
+
+                                    @Override
+                                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                        super.onFailure(statusCode, headers, responseString, throwable);
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        BaseClient.post(POSTS + post.getId() + LIKE, params, new JsonHttpResponseHandler() {
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                super.onSuccess(statusCode, headers, response);
+                                mliked = true;
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                super.onFailure(statusCode, headers, responseString, throwable);
+                            }
+
+                            @Override
+                            public void onFinish() {
+                                super.onFinish();
+
+                                BaseClient.get(POSTS + post.getId() + LIKE_COUNT, params, new JsonHttpResponseHandler() {
+                                    int sum = 0;
+
+                                    @Override
+                                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                        super.onSuccess(statusCode, headers, response);
+
+                                        try {
+                                            sum = JsonUtil.getEntity(response.getString("count"), Integer.class);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                        likeSum.setText(String.valueOf(sum));
+                                    }
+
+                                    @Override
+                                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                        super.onFailure(statusCode, headers, responseString, throwable);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            });
         }
 
         public void bindPost(final Post post) {
             this.post = post;
+            likeSum.setText(String.valueOf(post.getLikersSum()));
             postSubject.setText(post.getSubject());
             String dateString = post.getTimeStamp();
-            Date date = new Date(dateString);
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = new Date();
+            try {
+                date = psdf.parse(dateString);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
 //                    try {
 //                        date = sdf.parse(dateString);
 //                    } catch (ParseException e) {
@@ -420,7 +544,41 @@ public class PostsFragment extends Fragment{
                             ImageLoader.getInstance().displayImage(user.getGravatarURL(), posterIcon);
                             posterName.setText(user.getUsername());
                             if (user.getLocation() != null) {
-                                posterLoc.setText(user.getLocation());
+                                posterLoc.setText("From " + user.getLocation());
+                            }
+
+                            if (Constant.user != null) {
+                                if (user.getId() != Constant.user.getId()) {
+                                    likeState.setVisibility(View.VISIBLE);
+
+                                    RequestParams params = new RequestParams();
+                                    params.put("user_id", Constant.user.getId());
+                                    BaseClient.get(POSTS + post.getId() + ISLIKED, params,
+                                            new JsonHttpResponseHandler() {
+                                                boolean liked = false;
+
+                                                @Override
+                                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                                    super.onSuccess(statusCode, headers, response);
+
+                                                    try {
+                                                        liked = JsonUtil.getEntity(response.getString("liked"), Boolean.class);
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+
+                                                    mliked = liked;
+                                                    likeState.setChecked(liked);
+                                                }
+
+                                                @Override
+                                                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                                    super.onFailure(statusCode, headers, responseString, throwable);
+                                                }
+                                            });
+                                }
+                            } else {
+                                likeState.setVisibility(View.GONE);
                             }
                         }
                     }

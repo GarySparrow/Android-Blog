@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gary.blog.Constant;
 import com.gary.blog.Data.User;
@@ -55,7 +56,7 @@ public class UserInfoActivity extends AppCompatActivity{
 
     final RequestParams params = new RequestParams();
 
-    private boolean followed;
+    private boolean mfollowed;
 
     private Handler handler = new Handler() {
 
@@ -101,7 +102,7 @@ public class UserInfoActivity extends AppCompatActivity{
             .white));
         toolbar.setTitle("");
         loadingDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
-        loadingDialog.setTitleText("Loading...");
+//        loadingDialog.setTitleText("Loading...");
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -118,6 +119,40 @@ public class UserInfoActivity extends AppCompatActivity{
             public void onClick(View v) {
                 if (nameText.isEnabled()) {
                     //edit_info
+                    RequestParams upParams = new RequestParams();
+                    upParams.put("location", locationText.getText().toString());
+                    upParams.put("about_me", aboutmeText.getText().toString());
+                    upParams.put("name", nameText.getText().toString());
+                    BaseClient.post("update_info/" + Constant.user.getId() + "/",
+                            upParams, new JsonHttpResponseHandler() {
+                                boolean code = false;
+
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    super.onSuccess(statusCode, headers, response);
+                                    try {
+                                        code = JsonUtil.getEntity(response.getString("code"), Boolean.class);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    if (code) {
+                                        Toast.makeText(UserInfoActivity.this, "修改成功!",
+                                                Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(UserInfoActivity.this, "修改失败...",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                    super.onFailure(statusCode, headers, responseString, throwable);
+                                    Toast.makeText(UserInfoActivity.this, "修改失败...",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+
+                            });
                 }
 
 //                nameText.setFocusable(!nameText.isFocusable());
@@ -154,24 +189,24 @@ public class UserInfoActivity extends AppCompatActivity{
         } else {
             BaseClient.get(USERS + Constant.user.getId() + ISFOLLOWED, params, new JsonHttpResponseHandler() {
 
-                Boolean code;
+                Boolean followed;
 
                 @Override
                 public void onStart() {
                     super.onStart();
-                    loadingDialog.show();
+//                    loadingDialog.show();
                 }
 
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     super.onSuccess(statusCode, headers, response);
                     try {
-                        code = JsonUtil.getEntity(response.getString("res"), Boolean.class);
+                        followed = JsonUtil.getEntity(response.getString("followed"), Boolean.class);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
 
-                    followed = code;
+                    mfollowed = followed;
                     followeState.setChecked(followed);
 //                    Message msg = new Message();
 //                    msg.obj = code;
@@ -188,7 +223,7 @@ public class UserInfoActivity extends AppCompatActivity{
                 @Override
                 public void onFinish() {
                     super.onFinish();
-                    loadingDialog.dismiss();
+//                    loadingDialog.dismiss();
                 }
             });
 //            Thread t = new Thread(new Runnable() {
@@ -222,27 +257,28 @@ public class UserInfoActivity extends AppCompatActivity{
             followeState.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    followed = !followed;
-                    if (!followed) {
+                    mfollowed = !mfollowed;
+                    if (!mfollowed) {
                         BaseClient.post(USERS + Constant.user.getId() + UNFOLLOW,
                                 params, new JsonHttpResponseHandler() {
-                                    Boolean code;
+                                    Boolean followed;
 
                                     @Override
                                     public void onStart() {
                                         super.onStart();
-                                        loadingDialog.show();
+//                                        loadingDialog.show();
                                     }
 
                                     @Override
                                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                         super.onSuccess(statusCode, headers, response);
                                         try {
-                                            code = JsonUtil.getEntity(response.getString("res"), Boolean.class);
+                                            followed = JsonUtil.getEntity(response.getString("followed"), Boolean.class);
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
 
+//                                        followeState.setChecked(followed);
 //                                        Message msg = new Message();
 //                                        msg.obj = code;
 //                                        msg.what = Constant.Follow;
@@ -259,7 +295,7 @@ public class UserInfoActivity extends AppCompatActivity{
                                     @Override
                                     public void onFinish() {
                                         super.onFinish();
-                                        loadingDialog.dismiss();
+//                                        loadingDialog.dismiss();
                                     }
                                 });
 //                        Thread t = new Thread(new Runnable() {
@@ -275,23 +311,24 @@ public class UserInfoActivity extends AppCompatActivity{
                     } else {
                         BaseClient.post(USERS + Constant.user.getId() + FOLLOW,
                                 params, new JsonHttpResponseHandler() {
-                                    Boolean code;
+                                    Boolean followed;
 
                                     @Override
                                     public void onStart() {
                                         super.onStart();
-                                        loadingDialog.show();
+//                                        loadingDialog.show();
                                     }
 
                                     @Override
                                     public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                                         super.onSuccess(statusCode, headers, response);
                                         try {
-                                            code = JsonUtil.getEntity(response.getString("res"), Boolean.class);
+                                            followed = JsonUtil.getEntity(response.getString("followed"), Boolean.class);
                                         } catch (JSONException e) {
                                             e.printStackTrace();
                                         }
 
+//                                        followeState.setChecked(followed);
 //                                        Message msg = new Message();
 //                                        msg.obj = code;
 //                                        msg.what = Constant.Follow;
@@ -307,7 +344,7 @@ public class UserInfoActivity extends AppCompatActivity{
                                     @Override
                                     public void onFinish() {
                                         super.onFinish();
-                                        loadingDialog.dismiss();
+//                                        loadingDialog.dismiss();
                                     }
                                 });
                     }

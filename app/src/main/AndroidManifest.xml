@@ -24,16 +24,17 @@
         <activity android:name=".Activity.LaunchActivity"
             android:theme="@style/AppBaseTheme"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
 
         </activity>
 
         <activity android:name="com.gary.blog.Activity.MainActivity"
             android:theme="@style/AppBaseTheme"
             android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <activity android:name="com.gary.blog.Activity.LoginActivity"
@@ -74,6 +75,12 @@
             android:parentActivityName=".Activity.LoginActivity">
 
         </activity>
+
+        <!--<activity android:name=".Activity.CubeActivity"-->
+            <!--android:screenOrientation="portrait"-->
+            <!--android:theme="@style/AppBaseTheme"-->
+            <!--android:parentActivityName=".Activity.MainActivity">-->
+        <!--</activity>-->
     </application>
 
 </manifest>

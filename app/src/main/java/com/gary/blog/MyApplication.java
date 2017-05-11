@@ -59,8 +59,6 @@ public class MyApplication extends Application{
                 .writeDebugLogs() // Remove for releaseapp
                 .build();
         ImageLoader.getInstance().init(imageLoaderConfiguration);
-        ImageLoader.getInstance().clearDiskCache();
-        ImageLoader.getInstance().clearMemoryCache();
     }
 
     private static MyApplication instance;

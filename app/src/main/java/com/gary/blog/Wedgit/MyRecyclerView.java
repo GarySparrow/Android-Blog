@@ -25,6 +25,7 @@ public class MyRecyclerView extends RecyclerView{
 //        if (getParent() != null) {
 //            getParent().requestDisallowInterceptTouchEvent(true);
 //        }
+//        return false;
         return super.dispatchTouchEvent(ev);
     }
 
@@ -33,6 +34,7 @@ public class MyRecyclerView extends RecyclerView{
 //        if (getParent() != null) {
 //            getParent().requestDisallowInterceptTouchEvent(true);
 //        }
+//        return true;
         return super.onInterceptTouchEvent(e);
     }
 
@@ -41,6 +43,7 @@ public class MyRecyclerView extends RecyclerView{
 //        if (getParent() != null) {
 //            getParent().requestDisallowInterceptTouchEvent(true);
 //        }
+//        return true;
         return super.onTouchEvent(e);
     }
 }
