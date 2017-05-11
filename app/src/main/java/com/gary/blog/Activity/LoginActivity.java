@@ -149,6 +149,7 @@ public class LoginActivity extends AppCompatActivity {
             RequestParams params = new RequestParams();
             params.put("email", username);
             params.put("psw", psw);
+
             BaseClient.post(Constant.LOGIN, params, new JsonHttpResponseHandler() {
 
                 @Override
@@ -161,14 +162,17 @@ public class LoginActivity extends AppCompatActivity {
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     super.onSuccess(statusCode, headers, response);
                     User user = null;
+                    String token = null;
                     try {
                         user = JsonUtil.getEntity(response.getString("user"), User.class);
+                        token = response.getString("token");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     Toast.makeText(LoginActivity.this, "登录成功",
                             Toast.LENGTH_SHORT).show();
 
+                    Constant.token = token;
                     Constant.user = user;
                     Intent intent = MainActivity.newIntent(LoginActivity.this);
                     startActivity(intent);
@@ -192,7 +196,7 @@ public class LoginActivity extends AppCompatActivity {
 //                        public void run() {
 //                            UserResponse response = UserService.login(username, psw);
 //                            Message msg = new Message();
-//                            msg.obj = response;
+//                            msg.obj =- response;
 //                            msg.what = Constant.UserLogin;
 //                            handler.sendMessage(msg);
 //                        }

@@ -27,6 +27,7 @@ public class MyRefreshLayout extends SwipeRefreshLayout{
 //        if (getParent() != null) {
 //            getParent().requestDisallowInterceptTouchEvent(true);
 //        }
+//        return false;
         return super.dispatchTouchEvent(ev);
     }
 
@@ -35,6 +36,7 @@ public class MyRefreshLayout extends SwipeRefreshLayout{
 //        if (getParent() != null) {
 //            getParent().requestDisallowInterceptTouchEvent(true);
 //        }
+//        return true;
         return super.onInterceptTouchEvent(e);
     }
 

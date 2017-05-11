@@ -28,6 +28,7 @@
             android:src="@drawable/default_icon"
             android:id="@+id/user_icon"
             android:layout_margin="30dp"
+            android:transitionName="user_icon"
             android:layout_centerHorizontal="true" />
 
         <LinearLayout

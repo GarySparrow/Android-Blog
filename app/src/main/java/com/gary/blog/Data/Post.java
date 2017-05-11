@@ -15,6 +15,7 @@ public class Post implements Serializable{
     private String authorURL;
     private String commentsURL;
     private String timeStamp;
+    private int likersSum;
     private int commentCount;
     private int id;
 
@@ -22,10 +23,6 @@ public class Post implements Serializable{
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getSubject() {
@@ -40,32 +37,16 @@ public class Post implements Serializable{
         return authorURL;
     }
 
-    public void setAuthorURL(String authorURL) {
-        this.authorURL = authorURL;
-    }
-
     public String getCommentsURL() {
         return commentsURL;
-    }
-
-    public void setCommentsURL(String commentsURL) {
-        this.commentsURL = commentsURL;
     }
 
     public String getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(String timeStamp) {
-        this.timeStamp = timeStamp;
-    }
-
     public int getCommentCount() {
         return commentCount;
-    }
-
-    public void setCommentCount(int commentCount) {
-        this.commentCount = commentCount;
     }
 
     @Override
@@ -77,15 +58,12 @@ public class Post implements Serializable{
         return videoPath;
     }
 
-    public void setVideoPath(String videoPath) {
-        this.videoPath = videoPath;
-    }
-
     public ArrayList<String> getImgsPath() {
         return imgsPath;
     }
 
-    public void setImgsPath(ArrayList<String> imgsPath) {
-        this.imgsPath = imgsPath;
+    public int getLikersSum() {
+        return likersSum;
     }
+
 }
