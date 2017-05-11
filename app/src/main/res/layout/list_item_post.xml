@@ -20,14 +20,17 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:id="@+id/data_layout"
-            android:layout_margin="4dp"
-            android:layout_centerVertical="true"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_margin="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
                 android:id="@+id/post_head">
 
                 <com.gary.blog.Wedgit.CircleImage
@@ -77,29 +80,71 @@
 
             </LinearLayout>
 
+
             <RelativeLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/post_head"
-                android:layout_margin="4dp">
+                android:layout_below="@id/post_head">
 
-                <TextView
-                    android:layout_width="match_parent"
+                <RelativeLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/poster_loc"
-                    android:textSize="18sp"
-                    android:textColor="@color/gray"
-                    android:text="From Unknow Space"/>
+                    android:layout_marginTop="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:id="@+id/text_layot">
 
-                <TextView
-                    android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/poster_loc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="From Unknow Space"
+                        android:textColor="@color/gray"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/post_subject"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/poster_loc"
+                        android:ellipsize="end"
+                        android:text="nothing"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="16sp" />
+
+                </RelativeLayout>
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:ellipsize="end"
-                    android:id="@+id/post_subject"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_below="@id/poster_loc"
-                    android:text="nothing"/>
+                    android:orientation="horizontal"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:gravity="left|center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:id="@+id/like_sum"
+                        android:text=""/>
+
+                    <com.sackcentury.shinebuttonlib.ShineButton
+                        android:id="@+id/like_state"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginLeft="4dp"
+                        app:allow_random_color="true"
+                        app:btn_color="@color/gray_btn_bg_color"
+                        app:btn_fill_color="@color/red_btn_bg_color"
+                        app:enable_flashing="true"
+                        android:visibility="gone"
+                        app:shine_turn_angle="20"
+                        app:siShape="@raw/like" />
+
+                </LinearLayout>
+
 
             </RelativeLayout>
 
@@ -125,6 +170,7 @@
                     android:id="@+id/hint_text"/>
 
             </FrameLayout>
+
 
         </LinearLayout>
 

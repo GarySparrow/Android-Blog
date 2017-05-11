@@ -18,16 +18,29 @@
 
         <include layout="@layout/activity_toolbar"></include>
 
+
         <android.support.v4.widget.DrawerLayout
             android:id="@+id/drawerlayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
 
             <include layout="@layout/activity_content"></include>
 
             <include layout="@layout/activity_main_menu"></include>
 
         </android.support.v4.widget.DrawerLayout>
+
+        <!--<android.support.v4.widget.DrawerLayout-->
+            <!--android:id="@+id/drawerlayout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent">-->
+
+            <!--<include layout="@layout/activity_content"></include>-->
+
+            <!--<include layout="@layout/activity_main_menu"></include>-->
+
+        <!--</android.support.v4.widget.DrawerLayout>-->
 
     </LinearLayout>
 

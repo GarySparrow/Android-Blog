@@ -1,12 +1,14 @@
 package com.gary.blog.Activity;
 
 
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -28,7 +30,6 @@ import com.gary.blog.Data.User;
 import com.gary.blog.Fragment.CommentsFragment;
 import com.gary.blog.Fragment.FollowedFragment;
 import com.gary.blog.Fragment.PostsFragment;
-import com.gary.blog.Fragment.UpdateFragment;
 import com.gary.blog.MyApplication;
 import com.gary.blog.R;
 import com.gary.blog.Utils.NetWorkUtil;
@@ -97,14 +98,14 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tablayout);
 
         postsFragment = new PostsFragment();
-        commentsFragment = new CommentsFragment();
+//        commentsFragment = new CommentsFragment();
         followedFragment = new FollowedFragment();
 
         adapter = new ViewPagerAdapter(fm);
         adapter.addFragment(postsFragment, "首页");
         adapter.addFragment(followedFragment, "关注");
-        adapter.addFragment(commentsFragment, "NONE");
-        adapter.addFragment(new UpdateFragment(), "NONE");
+//        adapter.addFragment(commentsFragment, "NONE");
+//        adapter.addFragment(new UpdateFragment(), "NONE");
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -121,6 +122,10 @@ public class MainActivity extends AppCompatActivity {
         drawerToggle.syncState();
         drawerLayout.setDrawerListener(drawerToggle);
 
+        usernameText = (TextView) navigationView.getHeaderView(0).findViewById(R.id.username);
+        userIcon = (CircleImage) navigationView.getHeaderView(0).findViewById(R.id.user_icon);
+        emailText = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_email);
+
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -134,6 +139,8 @@ public class MainActivity extends AppCompatActivity {
                             Intent intent = UserInfoActivity.newIntent(MainActivity.this);
                             intent.putExtra("user", Constant.user);
                             startActivity(intent);
+//                            startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(
+//                                    MainActivity.this, userIcon, "user_icon").toBundle());
                         }
                         break;
                     case R.id.logout:
@@ -144,10 +151,12 @@ public class MainActivity extends AppCompatActivity {
                             Constant.user = null;
                             usernameText = (TextView) navigationView.getHeaderView(0).findViewById(R.id.username);
                             userIcon = (CircleImage) navigationView.getHeaderView(0).findViewById(R.id.user_icon);
+                            emailText = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_email);
+
                             usernameText.setText("User Name");
                             userIcon.setImageDrawable(getResources().getDrawable(R.drawable.default_icon));
-                            emailText = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_email);
                             emailText.setText("E-mail");
+                            postsFragment.onRefresh();
                         }
                         break;
                     default:
@@ -162,7 +171,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (Constant.user == null) {
-                    startActivity(LoginActivity.newIntent(MainActivity.this));
+                    Intent intent = LoginActivity.newIntent(MainActivity.this);
+                    startActivity(intent, ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            MainActivity.this, userIcon, "user_icon").toBundle());
                 } else {
                     Intent intent = UserInfoActivity.newIntent(MainActivity.this);
                     intent.putExtra("user", Constant.user);
@@ -179,8 +190,9 @@ public class MainActivity extends AppCompatActivity {
         }
         if (Constant.user != null) {
             usernameText = (TextView) navigationView.getHeaderView(0).findViewById(R.id.username);
-            emailText = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_email);
             userIcon = (CircleImage) navigationView.getHeaderView(0).findViewById(R.id.user_icon);
+            emailText = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_email);
+
             usernameText.setText(Constant.user.getUsername());
             emailText.setText(Constant.user.getEmail());
             if (NetWorkUtil.isNetWorkOpened(MainActivity.this)) {
@@ -220,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.new_post:
                 if (Constant.user != null) {
                     Intent intent = WritePostActivity.newIntent(MainActivity.this);
-                    startActivity(intent);
+                    startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
                 } else {
                     Toast.makeText(MainActivity.this, "请先登录",
                             Toast.LENGTH_SHORT).show();

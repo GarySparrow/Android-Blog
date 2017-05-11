@@ -17,6 +17,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Explode;
 import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,7 +50,7 @@ import java.util.ArrayList;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 import static com.gary.blog.Constant.FAILURE;
-import static com.gary.blog.Constant.Posts;
+import static com.gary.blog.Constant.POSTS;
 import static com.gary.blog.Constant.SUCCESS;
 
 /**
@@ -116,6 +117,8 @@ public class WritePostActivity extends AppCompatActivity{
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write_post);
+
+        getWindow().setEnterTransition(new Explode().setDuration(500));
 
         videoLayout = (LinearLayout) findViewById(R.id.video_layout);
         videoButton = (FloatingActionButton) findViewById(R.id.video_add);
@@ -330,7 +333,7 @@ public class WritePostActivity extends AppCompatActivity{
 //                            "\"body\": \"" + JsonUtil.ready4Json(postSubject.getText().toString()) + "\","
 //                            + "\"id\": " + Constant.user.getId()
 //                            + "}";
-                BaseClient.post(Posts, params, new JsonHttpResponseHandler() {
+                BaseClient.post(POSTS, params, new JsonHttpResponseHandler() {
 
                     @Override
                     public void onStart() {

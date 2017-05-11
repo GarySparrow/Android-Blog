@@ -18,7 +18,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import static com.gary.blog.Constant.Posts;
+import static com.gary.blog.Constant.POSTS;
 
 /**
  * Created by hasee on 2017/4/30.
@@ -37,7 +37,7 @@ public class LaunchActivity extends AppCompatActivity{
 
     private void loadingThread() {
 
-        BaseClient.get(Posts, null, new JsonHttpResponseHandler() {
+        BaseClient.get(POSTS, null, new JsonHttpResponseHandler() {
 
             @Override
             public void onStart() {

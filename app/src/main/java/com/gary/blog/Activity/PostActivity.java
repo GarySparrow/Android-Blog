@@ -53,6 +53,7 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -61,6 +62,8 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 import static com.gary.blog.Constant.FAILURE;
 import static com.gary.blog.Constant.SUCCESS;
+import static com.gary.blog.Constant.psdf;
+import static com.gary.blog.Constant.sdf;
 
 /**
  * Created by hasee on 2016/12/16.
@@ -600,9 +603,16 @@ public class PostActivity extends AppCompatActivity{
 
         if (post != null) {
             postSubject.setText(post.getSubject());
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date date = new Date(post.getTimeStamp());
-            String dateString = sdf.format(date);
+
+            String dateString = post.getTimeStamp();
+            Date date = new Date();
+            try {
+                date = psdf.parse(dateString);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            dateString = sdf.format(date);
             postTime.setText(dateString);
 
             if (post.getVideoPath() != null) {
@@ -625,7 +635,7 @@ public class PostActivity extends AppCompatActivity{
                     final int idx = i;
                     ImageView img = new ImageView(this);
                     GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                    params.height = 100; params.width = 100;
+                    params.height = 128; params.width = 64;
                     params.leftMargin = params.topMargin = params.bottomMargin = params.rightMargin = 10;
                     img.setLayoutParams(params);
                     imgsLayout.addView(img);
