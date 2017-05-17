@@ -20,6 +20,12 @@ public class MyViewPager extends ViewPager{
     }
 
     @Override
+    protected void onPageScrolled(int position, float offset, int offsetPixels) {
+
+        super.onPageScrolled(position, offset, offsetPixels);
+    }
+
+    @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         return super.dispatchTouchEvent(ev);
 //        return false;

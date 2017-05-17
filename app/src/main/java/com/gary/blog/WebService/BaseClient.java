@@ -13,11 +13,13 @@ import com.loopj.android.http.RequestParams;
 
 public class BaseClient {
 //    private static final String BASE_URL = "https://garyflask.herokuapp.com/api/v1.0/";
-    private static final String BASE_URL = "http://120.25.254.10/api/v1.0/";
+//    private static final String BASE_URL = "http://120.25.254.10/api/v1.0/";
+    private static final String BASE_URL = "http://garymax.com/api/v1.0/";
 //    private static final String BASE_URL = "http://127.0.0.1:5000/api/v1.0/";
 
 
-    private static AsyncHttpClient client = new AsyncHttpClient();
+    private static AsyncHttpClient client = new AsyncHttpClient(true, 80, 443);
+
     static Context context = MyApplication.getInstance();
 
 

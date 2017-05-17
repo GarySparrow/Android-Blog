@@ -14,7 +14,7 @@
         <!--android:layout_marginRight="15dp"-->
         <!--android:layout_marginTop="15dp"-->
         <!--app:cardCornerRadius="4dp">-->
-
+    
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -92,7 +92,7 @@
                     android:layout_marginTop="4dp"
                     android:layout_marginLeft="4dp"
                     android:layout_marginRight="4dp"
-                    android:id="@+id/text_layot">
+                    android:id="@+id/text_layout">
 
                     <TextView
                         android:id="@+id/poster_loc"
@@ -115,6 +115,30 @@
                 </RelativeLayout>
 
 
+                <FrameLayout
+                    android:layout_width="50dp"
+                    android:layout_height="80dp"
+                    android:gravity="center"
+                    android:layout_below="@id/text_layout"
+                    android:background="@color/gray_btn_bg_color"
+                    android:visibility="gone"
+                    android:id="@+id/hint_layout">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/img_first"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:layout_gravity="center"
+                        android:textColor="@color/black"
+                        android:id="@+id/hint_text"/>
+
+                </FrameLayout>
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -126,14 +150,15 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="12sp"
+                        android:gravity="bottom"
+                        android:textSize="18sp"
                         android:id="@+id/like_sum"
                         android:text=""/>
 
                     <com.sackcentury.shinebuttonlib.ShineButton
                         android:id="@+id/like_state"
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:layout_marginLeft="4dp"
                         app:allow_random_color="true"
                         app:btn_color="@color/gray_btn_bg_color"
@@ -147,30 +172,6 @@
 
 
             </RelativeLayout>
-
-            <FrameLayout
-                android:layout_width="50dp"
-                android:layout_height="80dp"
-                android:gravity="center"
-                android:background="@color/gray_btn_bg_color"
-                android:visibility="gone"
-                android:id="@+id/hint_layout">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/img_first"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:layout_gravity="center"
-                    android:textColor="@color/black"
-                    android:id="@+id/hint_text"/>
-
-            </FrameLayout>
-
 
         </LinearLayout>
 

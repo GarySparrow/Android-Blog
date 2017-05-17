@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -43,7 +42,6 @@ import com.gary.blog.Utils.JsonUtil;
 import com.gary.blog.WebService.BaseClient;
 import com.gary.blog.Wedgit.CircleImage;
 import com.gary.blog.Wedgit.MyRecyclerView;
-import com.gary.blog.Wedgit.MyRefreshLayout;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -72,17 +70,17 @@ import static com.gary.blog.Constant.sdf;
 public class PostActivity extends AppCompatActivity{
 
     private static final String TAG = "PostActivity";
-    private static final int EDIT = R.id.edit_post;
-    private static final int DONE = R.id.edit_done;
+//    private static final int EDIT = R.id.edit_post;
+//    private static final int DONE = R.id.edit_done;
 
     private GridLayout imgsLayout;
     private LinearLayout emptyView;
     private CircleImage posterIcon;
     private TextView posterName, postTime, toolbarText;
-    private MyRefreshLayout refreshLayout;
+//    private MyRefreshLayout refreshLayout;
     private EditText postSubject;
     private MyRecyclerView recyclerView;
-    private TextView newComment;
+//    private TextView newComment;
     private Menu menu;
     private LinearLayout posterLayout;
     private RelativeLayout videoView;
@@ -93,13 +91,13 @@ public class PostActivity extends AppCompatActivity{
     private CommentAdapter commentAdapter;
     private adapterObserver observer;
 
-    private SwipeRefreshLayout.OnRefreshListener listener;
+//    private SwipeRefreshLayout.OnRefreshListener listener;
 
     private User poster;
     private Post post;
-    private ArrayList<Comment> comments;
-    private boolean isRefresh;
-    private String preSubject;
+//    private ArrayList<Comment> comments;
+//    private boolean isRefresh;
+//    private String preSubject;
 
     private Handler handler = new Handler() {
         @Override
