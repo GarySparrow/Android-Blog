@@ -1,7 +1,6 @@
 package com.gary.blog.Activity;
 
 
-import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -232,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.new_post:
                 if (Constant.user != null) {
                     Intent intent = WritePostActivity.newIntent(MainActivity.this);
-                    startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+                    startActivity(intent);
                 } else {
                     Toast.makeText(MainActivity.this, "请先登录",
                             Toast.LENGTH_SHORT).show();

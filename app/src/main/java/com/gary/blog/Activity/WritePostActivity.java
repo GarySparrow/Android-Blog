@@ -17,7 +17,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Explode;
 import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -118,7 +117,7 @@ public class WritePostActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write_post);
 
-        getWindow().setEnterTransition(new Explode().setDuration(500));
+//        getWindow().setEnterTransition(new Explode().setDuration(500));
 
         videoLayout = (LinearLayout) findViewById(R.id.video_layout);
         videoButton = (FloatingActionButton) findViewById(R.id.video_add);

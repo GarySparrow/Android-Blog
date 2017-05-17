@@ -139,6 +139,9 @@ public class UserInfoActivity extends AppCompatActivity{
                                     if (code) {
                                         Toast.makeText(UserInfoActivity.this, "修改成功!",
                                                 Toast.LENGTH_SHORT).show();
+                                        Constant.user.setLocation(locationText.getText().toString());
+                                        Constant.user.setAboutMe(aboutmeText.getText().toString());
+                                        Constant.user.setName(nameText.getText().toString());
                                     } else {
                                         Toast.makeText(UserInfoActivity.this, "修改失败...",
                                                 Toast.LENGTH_SHORT).show();

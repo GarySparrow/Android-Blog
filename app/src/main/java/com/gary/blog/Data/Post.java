@@ -15,6 +15,7 @@ public class Post implements Serializable{
     private String authorURL;
     private String commentsURL;
     private String timeStamp;
+    private User poster;
     private int likersSum;
     private int commentCount;
     private int id;
@@ -66,4 +67,11 @@ public class Post implements Serializable{
         return likersSum;
     }
 
+    public User getPoster() {
+        return poster;
+    }
+
+    public void setPoster(User poster) {
+        this.poster = poster;
+    }
 }

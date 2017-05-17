@@ -5,20 +5,19 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gary.blog.Activity.PostActivity;
 import com.gary.blog.Activity.UserInfoActivity;
-import com.gary.blog.Constant;
 import com.gary.blog.Data.Post;
 import com.gary.blog.Data.User;
 import com.gary.blog.R;
@@ -29,9 +28,9 @@ import com.gary.blog.Wedgit.CircleImage;
 import com.gary.blog.Wedgit.CubeLayout;
 import com.gary.blog.Wedgit.MyLinearLayout;
 import com.gary.blog.Wedgit.MyRecyclerView;
-import com.gary.blog.Wedgit.MyRefreshLayout;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.yalantis.phoenix.PullToRefreshView;
 
 import org.apache.http.Header;
 import org.json.JSONException;
@@ -41,6 +40,7 @@ import java.util.ArrayList;
 
 import static com.gary.blog.Constant.POSTS;
 import static com.gary.blog.Constant.bkDic;
+import static com.gary.blog.Constant.user;
 
 /**
  * Created by hasee on 2017/5/5.
@@ -50,12 +50,12 @@ public class FollowedFragment extends Fragment{
 
     private final static String TAG = "FollowedFragment";
 
-    private MyRefreshLayout refreshLayout;
+    private PullToRefreshView refreshLayout;
     private MyRecyclerView recyclerView;
     private PostAdapter postAdapter;
     private adapterObserver observer;
 
-    private SwipeRefreshLayout.OnRefreshListener refreshListener;
+    private PullToRefreshView.OnRefreshListener refreshListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,7 +67,7 @@ public class FollowedFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_lists, container, false);
 
-        refreshLayout = (MyRefreshLayout) view.findViewById(R.id.refresh_layout);
+        refreshLayout = (PullToRefreshView) view.findViewById(R.id.refresh_layout);
 //        refreshLayout.setBackgroundColor(getResources().getColor(R.color.lightgray));
 //        emptyView = (LinearLayout) view.findViewById(R.id.empty_view);
 //        emptyText = (TextView) view.findViewById(R.id.empty_text);
@@ -77,7 +77,8 @@ public class FollowedFragment extends Fragment{
 //            emptyText.setText("refreshing...");
 //        }
         recyclerView = (MyRecyclerView) view.findViewById(R.id.posts_view);
-        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 5);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+//        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 1);
 //        StaggeredGridLayoutManager layoutManager = new
 //                StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
 //        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -88,12 +89,23 @@ public class FollowedFragment extends Fragment{
 //            }
 //        });
 
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                return position % 3 == 0 ? 3 : 2;
-            }
-        });
+//
+//        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+//            @Override
+//            public int getSpanSize(int position) {
+//                if (position % 5 == 0) {
+//                    return 2;
+//                } else if (position % 5 == 1) {
+//                    return 3;
+//                } else if (position % 5 == 2){
+//                    return 3;
+//                } else if (position % 5 == 3) {
+//                    return 2;
+//                } else {
+//                    return 5;
+//                }
+//            }
+//        });
 
         recyclerView.setLayoutManager(layoutManager);
 //        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
@@ -112,16 +124,12 @@ public class FollowedFragment extends Fragment{
 
     private void init() {
 
-        if (Constant.user == null) {
-            return ;
-        }
-
         observer = new adapterObserver();
         postAdapter = new PostAdapter();
         postAdapter.registerAdapterDataObserver(observer);
         recyclerView.setAdapter(postAdapter);
         //        isRefresh = false;
-        refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        refreshListener = new PullToRefreshView.OnRefreshListener() {
             @Override
             public void onRefresh() {
 //                if (refreshLayout.isRefreshing()) {
@@ -129,6 +137,10 @@ public class FollowedFragment extends Fragment{
 //                            Toast.LENGTH_SHORT);
 //                } else {
                 if (NetWorkUtil.isNetWorkOpened(getContext())) {
+                    if (user == null) {
+                        Toast.makeText(getActivity(), "请先登录...", Toast.LENGTH_SHORT).show();
+                        return ;
+                    }
                     BaseClient.get(POSTS, null, new JsonHttpResponseHandler() {
                         @Override
                         public void onStart() {
@@ -166,6 +178,9 @@ public class FollowedFragment extends Fragment{
                             refreshLayout.setRefreshing(false);
                         }
                     });
+                } else {
+                    Toast.makeText(getActivity(), "请检查你的网络...", Toast.LENGTH_SHORT).show();
+                    refreshLayout.setRefreshing(false);
                 }
             }
         };

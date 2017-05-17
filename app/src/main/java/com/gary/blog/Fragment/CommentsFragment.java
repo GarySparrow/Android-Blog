@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,15 +16,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.gary.blog.Constant;
 import com.gary.blog.Data.Comment;
 import com.gary.blog.R;
+import com.gary.blog.Utils.NetWorkUtil;
 import com.gary.blog.Wedgit.MyAdapterDataObserver;
 import com.gary.blog.Wedgit.MyRecyclerView;
-import com.gary.blog.Wedgit.MyRefreshLayout;
+import com.yalantis.phoenix.PullToRefreshView;
 
 import java.util.ArrayList;
 
@@ -37,46 +35,21 @@ public class CommentsFragment extends Fragment{
 
     private final static String TAG = "CommentsFragment";
 
-    private MyRefreshLayout refreshLayout;
-    private LinearLayout emptyView;
+    private PullToRefreshView refreshLayout;
+//    private LinearLayout emptyView;
     private MyRecyclerView recyclerView;
     private CommentAdapter commentAdapter;
-    private AdapterObserver observer;
+    private AdapterObserver adapterObserver;
 
-    private boolean isRefresh;
+//    private boolean isRefresh;
 
-    private SwipeRefreshLayout.OnRefreshListener listener;
+    private PullToRefreshView.OnRefreshListener refreshListener;
 
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case Constant.UpdateRecyclerView:
-//                    isRefresh = true;
-//                    if (NetWorkUtil.isNetWorkOpened(getActivity())) {
-//                        new AsyncTask<String, Integer, CommentsResponse>() {
-//
-//                            @Override
-//                            protected CommentsResponse doInBackground(String... strings) {
-//                                return null;
-//                            }
-//
-//                            @Override
-//                            protected void onPostExecute(CommentsResponse commentsResponse) {
-//                                if (commentsResponse != null) {
-//                                    final ArrayList<Comment> comments;
-//                                    comments = commentsResponse.getComments();
-//                                    if (comments == null) {
-//                                        Log.e(TAG, "posts == null");
-//                                    } else {
-//
-//                                    }
-//                                }
-//                                refreshLayout.setRefreshing(false);
-//                                isRefresh = false;
-//                            }
-//                        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-//                    }
                     break;
                 default:
                     break;
@@ -96,7 +69,7 @@ public class CommentsFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_lists, container, false);
 
-        refreshLayout = (MyRefreshLayout) view.findViewById(R.id.refresh_layout);
+        refreshLayout = (PullToRefreshView) view.findViewById(R.id.refresh_layout);
 //        emptyView = (LinearLayout) view.findViewById(R.id.empty_view);
         recyclerView = (MyRecyclerView) view.findViewById(R.id.posts_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -104,7 +77,7 @@ public class CommentsFragment extends Fragment{
                 DividerItemDecoration.VERTICAL));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        updateUI();
+        init();
 
         return view;
     }
@@ -112,7 +85,6 @@ public class CommentsFragment extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
-        updateUI();
     }
 
     @Override
@@ -127,59 +99,29 @@ public class CommentsFragment extends Fragment{
     }
 
     //custom methods
-    private Thread getThread(final Handler handler) {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Message message = new Message();
-                message.what = Constant.UpdateRecyclerView;
-                handler.sendMessage(message);
-            }
-        });
-        return thread;
-    }
 
-    public void updateUI() {
-
-        if (observer == null) {
-            observer = new AdapterObserver();
-        }
-
-        if (commentAdapter == null) {
-            commentAdapter = new CommentAdapter();
-            commentAdapter.registerAdapterDataObserver(observer);
-        }
-
-        if (recyclerView != null && recyclerView.getAdapter() == null) {
-            recyclerView.setAdapter(commentAdapter);
-        }
-
-        isRefresh = false;
-
-        listener = new SwipeRefreshLayout.OnRefreshListener() {
+    public void init() {
+        adapterObserver = new AdapterObserver();
+        commentAdapter = new CommentAdapter();
+        commentAdapter.registerAdapterDataObserver(adapterObserver);
+        recyclerView.setAdapter(commentAdapter);
+        //        isRefresh = false;
+        refreshListener = new PullToRefreshView.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (isRefresh) {
-                    Toast.makeText(getActivity(), "正在加载",
-                            Toast.LENGTH_SHORT);
+//                if (refreshLayout.isRefreshing()) {
+//                    Toast.makeText(getActivity(), "正在加载",
+//                            Toast.LENGTH_SHORT);
+//                } else {
+                if (NetWorkUtil.isNetWorkOpened(getContext())) {
+
                 } else {
-                    getThread(handler).start();
+                    refreshLayout.setRefreshing(false);
                 }
             }
         };
+        refreshLayout.setOnRefreshListener(refreshListener);
 
-        if (refreshLayout != null) {
-            refreshLayout.setOnRefreshListener(listener);
-
-
-            refreshLayout.post(new Runnable() {
-                @Override
-                public void run() {
-                    refreshLayout.setRefreshing(true);
-                    listener.onRefresh();
-                }
-            });
-        }
     }
 
     //Define CommentHolder
@@ -255,7 +197,7 @@ public class CommentsFragment extends Fragment{
             if (recyclerView.getAdapter() != null) {
                 boolean visible = recyclerView.getAdapter().getItemCount() == 0;
                 recyclerView.setVisibility(visible ? View.GONE : View.VISIBLE);
-                emptyView.setVisibility(visible ? View.VISIBLE : View.GONE);
+//                emptyView.setVisibility(visible ? View.VISIBLE : View.GONE);
             }
         }
 

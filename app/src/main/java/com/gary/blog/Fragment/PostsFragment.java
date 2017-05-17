@@ -5,7 +5,6 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,10 +19,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.dou361.ijkplayer.widget.PlayerView;
 import com.gary.blog.Activity.PostActivity;
 import com.gary.blog.Constant;
 import com.gary.blog.Data.DataManager;
@@ -37,13 +34,14 @@ import com.gary.blog.Utils.NetWorkUtil;
 import com.gary.blog.WebService.BaseClient;
 import com.gary.blog.Wedgit.CircleImage;
 import com.gary.blog.Wedgit.MyRecyclerView;
-import com.gary.blog.Wedgit.MyRefreshLayout;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.sackcentury.shinebuttonlib.ShineButton;
+import com.yalantis.phoenix.PullToRefreshView;
 
 import org.apache.http.Header;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -69,7 +67,7 @@ public class PostsFragment extends Fragment implements onRefreshListener {
 
     private final static String TAG = "PostsFragment";
 
-    private MyRefreshLayout refreshLayout;
+    private PullToRefreshView refreshLayout;
     private LinearLayout emptyView;
     private TextView emptyText;
     private MyRecyclerView recyclerView;
@@ -80,7 +78,7 @@ public class PostsFragment extends Fragment implements onRefreshListener {
 
 //    private boolean isRefresh;
 
-    private SwipeRefreshLayout.OnRefreshListener refreshListener;
+    private PullToRefreshView.OnRefreshListener refreshListener;
 
 //    private Handler handler = new Handler() {
 //        @Override
@@ -142,7 +140,7 @@ public class PostsFragment extends Fragment implements onRefreshListener {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_lists, container, false);
 
-        refreshLayout = (MyRefreshLayout) view.findViewById(R.id.refresh_layout);
+        refreshLayout = (PullToRefreshView) view.findViewById(R.id.refresh_layout);
 //        emptyView = (LinearLayout) view.findViewById(R.id.empty_view);
 //        emptyText = (TextView) view.findViewById(R.id.empty_text);
 //        emptyText.setText("refreshing...");
@@ -154,20 +152,7 @@ public class PostsFragment extends Fragment implements onRefreshListener {
         recyclerView.addItemDecoration(new MyItemDecoration(6));
 //        launchImg = (ImageView) getActivity().findViewById(R.id.launch_img);
 
-        aCache = ACache.get(getActivity());
 
-        JSONObject response = aCache.getAsJSONObject(TAG);
-        if (response != null) {
-            try {
-                ArrayList<Post> posts = JsonUtil.getEntityList(
-                        response.getString("posts"), Post.class);
-                DataManager.getInstance(getActivity()).setPosts(posts);
-                postAdapter.setPosts(posts);
-                postAdapter.notifyDataSetChanged();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
         init();
         updateUI();
 
@@ -211,13 +196,15 @@ public class PostsFragment extends Fragment implements onRefreshListener {
     //custom methods
 
     private void init() {
+        aCache = ACache.get(getActivity());
+
         observer = new adapterObserver();
         postAdapter = new PostAdapter(DataManager.getInstance(getActivity())
             .getPosts());
         postAdapter.registerAdapterDataObserver(observer);
         recyclerView.setAdapter(postAdapter);
         //        isRefresh = false;
-        refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        refreshListener = new PullToRefreshView.OnRefreshListener() {
             @Override
             public void onRefresh() {
 //                if (refreshLayout.isRefreshing()) {
@@ -247,7 +234,7 @@ public class PostsFragment extends Fragment implements onRefreshListener {
                             } else {
                                 DataManager.getInstance(getActivity()).setPosts(posts);
                                 postAdapter.setPosts(posts);
-                                aCache.put("TAG", response);
+                                aCache.put(TAG, response);
                             }
                         }
 
@@ -266,6 +253,21 @@ public class PostsFragment extends Fragment implements onRefreshListener {
 //                                isRefresh = false;
                         }
                     });
+                } else {
+
+                    refreshLayout.setRefreshing(false);
+                    JSONObject response = aCache.getAsJSONObject(TAG);
+                    if (response != null) {
+                        try {
+                            ArrayList<Post> posts = JsonUtil.getEntityList(
+                                    response.getString("posts"), Post.class);
+                            DataManager.getInstance(getActivity()).setPosts(posts);
+                            postAdapter.setPosts(posts);
+                            postAdapter.notifyDataSetChanged();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
 
 
@@ -344,8 +346,8 @@ public class PostsFragment extends Fragment implements onRefreshListener {
         private LinearLayout dataLayout;
         private ShineButton likeState;
 //        private IjkVideoView video;
-        private PlayerView video;
-        private RelativeLayout videoView;
+//        private PlayerView video;
+//        private RelativeLayout videoView;
         private TextView postSubject, posterName, postDate, posterLoc, hintText, likeSum;
         private CircleImage posterIcon;
         private boolean mliked;
@@ -594,6 +596,31 @@ public class PostsFragment extends Fragment implements onRefreshListener {
 //                    postSubject.setText(style);
 //                    String date = "Unknown Date";
 //                    postDate.setText(date);
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                        super.onSuccess(statusCode, headers, response);
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                        super.onSuccess(statusCode, headers, responseString);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        super.onFinish();
                     }
                 });
 //            } else {
