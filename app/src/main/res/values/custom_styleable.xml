@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <declare-styleable name="ImgEditText">
-        <attr name="img_src" format="reference|integer"></attr>
-    </declare-styleable>
-
-</resources>
