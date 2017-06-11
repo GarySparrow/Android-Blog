@@ -23,6 +23,8 @@ import com.gary.blog.WebService.BaseClient;
 import com.gary.blog.Wedgit.ImgEditText;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.tencent.android.tpush.XGIOperateCallback;
+import com.tencent.android.tpush.XGPushManager;
 
 import org.apache.http.Header;
 import org.json.JSONException;
@@ -174,6 +176,18 @@ public class LoginActivity extends AppCompatActivity {
 
                     Constant.token = token;
                     Constant.user = user;
+                    XGPushManager.registerPush(getApplicationContext(), user.getEmail(),
+                            new XGIOperateCallback() {
+                                @Override
+                                public void onSuccess(Object o, int i) {
+
+                                }
+
+                                @Override
+                                public void onFail(Object o, int i, String s) {
+
+                                }
+                            });
                     Intent intent = MainActivity.newIntent(LoginActivity.this);
                     startActivity(intent);
                 }

@@ -5,17 +5,23 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.dou361.ijkplayer.widget.PlayStateParams;
+import com.dou361.ijkplayer.widget.PlayerView;
+import com.gary.blog.Activity.ImageActivity;
 import com.gary.blog.Activity.PostActivity;
 import com.gary.blog.Activity.UserInfoActivity;
 import com.gary.blog.Constant;
@@ -29,9 +35,11 @@ import com.gary.blog.Wedgit.CircleImage;
 import com.gary.blog.Wedgit.CubeLayout;
 import com.gary.blog.Wedgit.MyLinearLayout;
 import com.gary.blog.Wedgit.MyRecyclerView;
-import com.gary.blog.Wedgit.MyRefreshLayout;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.sackcentury.shinebuttonlib.ShineButton;
+import com.yalantis.phoenix.PullToRefreshView;
 
 import org.apache.http.Header;
 import org.json.JSONException;
@@ -39,7 +47,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import static com.gary.blog.Constant.FOLLOWED_POSTS;
+import static com.gary.blog.Constant.ISLIKED;
+import static com.gary.blog.Constant.LIKE;
+import static com.gary.blog.Constant.LIKE_COUNT;
 import static com.gary.blog.Constant.POSTS;
+import static com.gary.blog.Constant.UNLIKE;
+import static com.gary.blog.Constant.USERS;
 import static com.gary.blog.Constant.bkDic;
 
 /**
@@ -50,12 +64,12 @@ public class FollowedFragment extends Fragment{
 
     private final static String TAG = "FollowedFragment";
 
-    private MyRefreshLayout refreshLayout;
+    private PullToRefreshView refreshLayout;
     private MyRecyclerView recyclerView;
     private PostAdapter postAdapter;
     private adapterObserver observer;
 
-    private SwipeRefreshLayout.OnRefreshListener refreshListener;
+    private PullToRefreshView.OnRefreshListener refreshListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,7 +81,7 @@ public class FollowedFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_lists, container, false);
 
-        refreshLayout = (MyRefreshLayout) view.findViewById(R.id.refresh_layout);
+        refreshLayout = (PullToRefreshView) view.findViewById(R.id.refresh_layout);
 //        refreshLayout.setBackgroundColor(getResources().getColor(R.color.lightgray));
 //        emptyView = (LinearLayout) view.findViewById(R.id.empty_view);
 //        emptyText = (TextView) view.findViewById(R.id.empty_text);
@@ -77,7 +91,8 @@ public class FollowedFragment extends Fragment{
 //            emptyText.setText("refreshing...");
 //        }
         recyclerView = (MyRecyclerView) view.findViewById(R.id.posts_view);
-        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 5);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+//        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 1);
 //        StaggeredGridLayoutManager layoutManager = new
 //                StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
 //        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -88,18 +103,29 @@ public class FollowedFragment extends Fragment{
 //            }
 //        });
 
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                return position % 3 == 0 ? 3 : 2;
-            }
-        });
+//
+//        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+//            @Override
+//            public int getSpanSize(int position) {
+//                if (position % 5 == 0) {
+//                    return 2;
+//                } else if (position % 5 == 1) {
+//                    return 3;
+//                } else if (position % 5 == 2){
+//                    return 3;
+//                } else if (position % 5 == 3) {
+//                    return 2;
+//                } else {
+//                    return 5;
+//                }
+//            }
+//        });
 
         recyclerView.setLayoutManager(layoutManager);
 //        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),
 //            DividerItemDecoration.VERTICAL));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.addItemDecoration(new MyItemDecoration(12));
+        recyclerView.addItemDecoration(new MyItemDecoration(24));
 
         init();
         return view;
@@ -112,24 +138,28 @@ public class FollowedFragment extends Fragment{
 
     private void init() {
 
-        if (Constant.user == null) {
-            return ;
-        }
-
         observer = new adapterObserver();
         postAdapter = new PostAdapter();
         postAdapter.registerAdapterDataObserver(observer);
         recyclerView.setAdapter(postAdapter);
         //        isRefresh = false;
-        refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        refreshListener = new PullToRefreshView.OnRefreshListener() {
             @Override
             public void onRefresh() {
 //                if (refreshLayout.isRefreshing()) {
 //                    Toast.makeText(getActivity(), "正在加载",
 //                            Toast.LENGTH_SHORT);
 //                } else {
+                if (Constant.user == null) {
+                    return ;
+                }
                 if (NetWorkUtil.isNetWorkOpened(getContext())) {
-                    BaseClient.get(POSTS, null, new JsonHttpResponseHandler() {
+//                    if (user == null) {
+//                        Toast.makeText(getActivity(), "请先登录...", Toast.LENGTH_SHORT).show();
+//                        return ;
+//                    }
+                    BaseClient.get(USERS +
+                            Constant.user.getId() + FOLLOWED_POSTS, null, new JsonHttpResponseHandler() {
                         @Override
                         public void onStart() {
                             super.onStart();
@@ -166,6 +196,9 @@ public class FollowedFragment extends Fragment{
                             refreshLayout.setRefreshing(false);
                         }
                     });
+                } else {
+                    Toast.makeText(getActivity(), "请检查你的网络...", Toast.LENGTH_SHORT).show();
+                    refreshLayout.setRefreshing(false);
                 }
             }
         };
@@ -182,12 +215,16 @@ public class FollowedFragment extends Fragment{
 //Define PostHolder
 private class PostHolder extends RecyclerView.ViewHolder {
 
-    private TextView postSubject, posterName;
+    private TextView postSubject, posterName, likeSum;
+    private ShineButton likeState;
     private CircleImage posterIcon;
     private CardView cardView;
     private MyLinearLayout postLayout, posterLayout, commentLayout;
     private CubeLayout cubeLayout;
     private User user;
+    private GridLayout imgsLayout;
+    private RelativeLayout videoLayout;
+    private boolean mliked;
 
 
     public PostHolder(View itemView) {
@@ -201,12 +238,144 @@ private class PostHolder extends RecyclerView.ViewHolder {
         posterLayout = (MyLinearLayout) itemView.findViewById(R.id.poster_info);
         postLayout = (MyLinearLayout) itemView.findViewById(R.id.post_info);
         commentLayout = (MyLinearLayout) itemView.findViewById(R.id.comment_info);
+        videoLayout = (RelativeLayout) itemView.findViewById(R.id.video_layout);
+        imgsLayout = (GridLayout) itemView.findViewById(R.id.imgs_layout);
+        likeState = (ShineButton) itemView.findViewById(R.id.like_state);
+        likeSum = (TextView) itemView.findViewById(R.id.like_sum);
     }
 
     public void bindPost(final Post post) {
         if (post == null) {
             return ;
         }
+        likeState.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Constant.user == null) {
+                    return ;
+                }
+                final RequestParams params = new RequestParams();
+                params.put("user_id", Constant.user.getId());
+                if (mliked) {
+                    BaseClient.post(POSTS + post.getId() + UNLIKE, params, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            super.onSuccess(statusCode, headers, response);
+                            mliked = false;
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                            super.onFailure(statusCode, headers, responseString, throwable);
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            super.onFinish();
+
+                            BaseClient.get(POSTS + post.getId() + LIKE_COUNT, params, new JsonHttpResponseHandler() {
+                                int sum = 0;
+
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    super.onSuccess(statusCode, headers, response);
+
+                                    try {
+                                        sum = JsonUtil.getEntity(response.getString("count"), Integer.class);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    likeSum.setText(String.valueOf(sum));
+                                }
+
+                                @Override
+                                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                    super.onFailure(statusCode, headers, responseString, throwable);
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    BaseClient.post(POSTS + post.getId() + LIKE, params, new JsonHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            super.onSuccess(statusCode, headers, response);
+                            mliked = true;
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                            super.onFailure(statusCode, headers, responseString, throwable);
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            super.onFinish();
+
+                            BaseClient.get(POSTS + post.getId() + LIKE_COUNT, params, new JsonHttpResponseHandler() {
+                                int sum = 0;
+
+                                @Override
+                                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                    super.onSuccess(statusCode, headers, response);
+
+                                    try {
+                                        sum = JsonUtil.getEntity(response.getString("count"), Integer.class);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    likeSum.setText(String.valueOf(sum));
+                                }
+
+                                @Override
+                                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                    super.onFailure(statusCode, headers, responseString, throwable);
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        });
+        likeSum.setText(String.valueOf(post.getLikersSum()));
+        if (post.getVideoPath() != null) {
+            videoLayout.setVisibility(View.VISIBLE);
+            String videoPath = post.getVideoPath().toString();
+            PlayerView video = new PlayerView(getActivity(), videoLayout)
+                    .setTitle("Video")
+                    .setScaleType(PlayStateParams.fitparent)
+                    .forbidTouch(false)
+                    .hideMenu(true)
+                    .setPlaySource(videoPath);
+        }
+
+        if (post.getImgsPath() != null) {
+            imgsLayout.setVisibility(View.VISIBLE);
+            final ArrayList<String> path = post.getImgsPath();
+            imgsLayout.removeAllViews();
+            for (int i = 0; i < path.size(); i++) {
+                final int idx = i;
+                ImageView img = new ImageView(getActivity());
+                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+                params.height = 256;
+                params.width = 128;
+                params.leftMargin = params.topMargin = params.bottomMargin = params.rightMargin = 10;
+                img.setLayoutParams(params);
+                imgsLayout.addView(img);
+                img.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = ImageActivity.newIntent(getActivity());
+                        intent.putExtra(Constant.IMAGE_PATH, path.get(idx));
+                        startActivity(intent);
+                    }
+                });
+                ImageLoader.getInstance().displayImage(path.get(i), img);
+            }
+        }
+
         BaseClient.getAbs(post.getAuthorURL(), null, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -216,6 +385,40 @@ private class PostHolder extends RecyclerView.ViewHolder {
                     user = JsonUtil.getEntity(response.getString("user"), User.class);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                }
+
+                if (Constant.user != null) {
+                    if (user.getId() != Constant.user.getId()) {
+                        likeState.setVisibility(View.VISIBLE);
+
+                        RequestParams params = new RequestParams();
+                        params.put("user_id", Constant.user.getId());
+                        BaseClient.get(POSTS + post.getId() + ISLIKED, params,
+                                new JsonHttpResponseHandler() {
+                                    boolean liked = false;
+
+                                    @Override
+                                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                        super.onSuccess(statusCode, headers, response);
+
+                                        try {
+                                            liked = JsonUtil.getEntity(response.getString("liked"), Boolean.class);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                        mliked = liked;
+                                        likeState.setChecked(liked);
+                                    }
+
+                                    @Override
+                                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                        super.onFailure(statusCode, headers, responseString, throwable);
+                                    }
+                                });
+                    }
+                } else {
+                    likeState.setVisibility(View.GONE);
                 }
                 int idx = user.getUsername().charAt(user.getUsername().length() - 1);
                 idx = (idx % bkDic.length);
@@ -314,6 +517,9 @@ private class PostAdapter extends RecyclerView.Adapter<PostHolder> {
 
     @Override
     public void onBindViewHolder(PostHolder holder, int position) {
+        holder.imgsLayout.setVisibility(View.GONE);
+        holder.videoLayout.setVisibility(View.GONE);
+        holder.likeState.setVisibility(View.GONE);
         final Post post = posts.get(position);
         holder.bindPost(post);
 
@@ -345,6 +551,16 @@ private class PostAdapter extends RecyclerView.Adapter<PostHolder> {
         return posts;
     }
 
+    @Override
+    public void onViewRecycled(PostHolder holder) {
+        super.onViewRecycled(holder);
+        ImageLoader.getInstance().cancelDisplayTask(holder.posterIcon);
+        for (int i = 0; i < holder.imgsLayout.getChildCount(); i++) {
+            ImageLoader.getInstance().cancelDisplayTask((ImageView) holder.imgsLayout
+                    .getChildAt(i));
+        }
+
+    }
 }
 
 private class MyItemDecoration extends RecyclerView.ItemDecoration {

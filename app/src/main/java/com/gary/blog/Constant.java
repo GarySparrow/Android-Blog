@@ -10,6 +10,14 @@ import java.text.SimpleDateFormat;
 
 public class Constant {
     //handle
+    public static final String PUSH_SINGLE_ACCOUNT = "http://openapi.xg.qq.com/v2/push/single_account";
+    public static final String PUSH_SINGLE_ACCOUNT_SECRET = "openapi.xg.qq.com/v2/push/single_account";
+    public static final String PUSH_SINGLE_DEVICE = "http://openapi.xg.qq.com/v2/push/single_device";
+    public static final String PUSH_SINGLE_DEVICE_SECRET = "openapi.xg.qq.com/v2/push/single_device";
+    public static final String CHECK_PUSH_STATE = "http://openapi.xg.qq.com/v2/push/get_msg_status";
+    public static final String CHECK_PUSH_STATE_SECRET = "openapi.xg.qq.com/v2/push/get_msg_status";
+
+
     public static final String LOGIN = "login/";
     public static final String REGISTER = "register/";
     public static final String POSTS = "posts/";
@@ -21,6 +29,8 @@ public class Constant {
     public static final String LIKE = "/like/";
     public static final String UNLIKE = "/unlike/";
     public static final String LIKE_COUNT = "/like_count/";
+    public static final String UPDATE_INFO = "update_info/";
+    public static final String FOLLOWED_POSTS = "/timeline/";
 
     //Request
     public static final int PHOTO_GALLERY = 1;
@@ -33,7 +43,8 @@ public class Constant {
             R.drawable.pure_c1, R.drawable.pure_c2, R.drawable.pure_c3};
 
     public static User user = null;
-    public static String token = null;
+    public static String token = "";
+    public static String secretKey = "780915adbd2dd9ab2195aaefb43ee09b";
 
     public final static int UpdateRecyclerView = 1;
     public final static int UpdateData = 2;

@@ -5,7 +5,6 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,13 +16,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.dou361.ijkplayer.widget.PlayStateParams;
 import com.dou361.ijkplayer.widget.PlayerView;
+import com.gary.blog.Activity.ImageActivity;
 import com.gary.blog.Activity.PostActivity;
 import com.gary.blog.Constant;
 import com.gary.blog.Data.DataManager;
@@ -37,13 +38,14 @@ import com.gary.blog.Utils.NetWorkUtil;
 import com.gary.blog.WebService.BaseClient;
 import com.gary.blog.Wedgit.CircleImage;
 import com.gary.blog.Wedgit.MyRecyclerView;
-import com.gary.blog.Wedgit.MyRefreshLayout;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.sackcentury.shinebuttonlib.ShineButton;
+import com.yalantis.phoenix.PullToRefreshView;
 
 import org.apache.http.Header;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -69,7 +71,7 @@ public class PostsFragment extends Fragment implements onRefreshListener {
 
     private final static String TAG = "PostsFragment";
 
-    private MyRefreshLayout refreshLayout;
+    private PullToRefreshView refreshLayout;
     private LinearLayout emptyView;
     private TextView emptyText;
     private MyRecyclerView recyclerView;
@@ -80,7 +82,7 @@ public class PostsFragment extends Fragment implements onRefreshListener {
 
 //    private boolean isRefresh;
 
-    private SwipeRefreshLayout.OnRefreshListener refreshListener;
+    private PullToRefreshView.OnRefreshListener refreshListener;
 
 //    private Handler handler = new Handler() {
 //        @Override
@@ -142,7 +144,7 @@ public class PostsFragment extends Fragment implements onRefreshListener {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_lists, container, false);
 
-        refreshLayout = (MyRefreshLayout) view.findViewById(R.id.refresh_layout);
+        refreshLayout = (PullToRefreshView) view.findViewById(R.id.refresh_layout);
 //        emptyView = (LinearLayout) view.findViewById(R.id.empty_view);
 //        emptyText = (TextView) view.findViewById(R.id.empty_text);
 //        emptyText.setText("refreshing...");
@@ -154,20 +156,7 @@ public class PostsFragment extends Fragment implements onRefreshListener {
         recyclerView.addItemDecoration(new MyItemDecoration(6));
 //        launchImg = (ImageView) getActivity().findViewById(R.id.launch_img);
 
-        aCache = ACache.get(getActivity());
 
-        JSONObject response = aCache.getAsJSONObject(TAG);
-        if (response != null) {
-            try {
-                ArrayList<Post> posts = JsonUtil.getEntityList(
-                        response.getString("posts"), Post.class);
-                DataManager.getInstance(getActivity()).setPosts(posts);
-                postAdapter.setPosts(posts);
-                postAdapter.notifyDataSetChanged();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
         init();
         updateUI();
 
@@ -211,13 +200,15 @@ public class PostsFragment extends Fragment implements onRefreshListener {
     //custom methods
 
     private void init() {
+        aCache = ACache.get(getActivity());
+
         observer = new adapterObserver();
         postAdapter = new PostAdapter(DataManager.getInstance(getActivity())
             .getPosts());
         postAdapter.registerAdapterDataObserver(observer);
         recyclerView.setAdapter(postAdapter);
         //        isRefresh = false;
-        refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        refreshListener = new PullToRefreshView.OnRefreshListener() {
             @Override
             public void onRefresh() {
 //                if (refreshLayout.isRefreshing()) {
@@ -247,7 +238,7 @@ public class PostsFragment extends Fragment implements onRefreshListener {
                             } else {
                                 DataManager.getInstance(getActivity()).setPosts(posts);
                                 postAdapter.setPosts(posts);
-                                aCache.put("TAG", response);
+                                aCache.put(TAG, response);
                             }
                         }
 
@@ -266,6 +257,21 @@ public class PostsFragment extends Fragment implements onRefreshListener {
 //                                isRefresh = false;
                         }
                     });
+                } else {
+
+                    refreshLayout.setRefreshing(false);
+                    JSONObject response = aCache.getAsJSONObject(TAG);
+                    if (response != null) {
+                        try {
+                            ArrayList<Post> posts = JsonUtil.getEntityList(
+                                    response.getString("posts"), Post.class);
+                            DataManager.getInstance(getActivity()).setPosts(posts);
+                            postAdapter.setPosts(posts);
+                            postAdapter.notifyDataSetChanged();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
 
 
@@ -339,16 +345,16 @@ public class PostsFragment extends Fragment implements onRefreshListener {
     //Define PostHolder
     private class PostHolder extends RecyclerView.ViewHolder {
 
-        private FrameLayout hintLayout;
-        private ImageView imgFirst;
-        private LinearLayout dataLayout;
+        private LinearLayout dataLayout, likeLayout;
+        private GridLayout imgsLayout;
+        private RelativeLayout videoLayout;
         private ShineButton likeState;
 //        private IjkVideoView video;
-        private PlayerView video;
-        private RelativeLayout videoView;
-        private TextView postSubject, posterName, postDate, posterLoc, hintText, likeSum;
+//        private PlayerView video;
+//        private RelativeLayout videoView;
+        private TextView postSubject, posterName, postDate, posterLoc, likeSum;
         private CircleImage posterIcon;
-        private boolean mliked;
+                private boolean mliked;
         private Post post;
 
 //        private Handler holderHandler = new Handler() {
@@ -370,11 +376,14 @@ public class PostsFragment extends Fragment implements onRefreshListener {
             posterIcon = (CircleImage) itemView.findViewById(R.id.poster_icon);
             posterLoc = (TextView) itemView.findViewById(R.id.poster_loc);
             dataLayout = (LinearLayout) itemView.findViewById(R.id.data_layout);
-            imgFirst = (ImageView) itemView.findViewById(R.id.img_first);
-            hintLayout = (FrameLayout) itemView.findViewById(R.id.hint_layout);
-            hintText = (TextView) itemView.findViewById(R.id.hint_text);
+//            imgFirst = (ImageView) itemView.findViewById(R.id.img_first);
+//            hintLayout = (FrameLayout) itemView.findViewById(R.id.hint_layout);
+//            hintText = (TextView) itemView.findViewById(R.id.hint_text);
             likeState = (ShineButton) itemView.findViewById(R.id.like_state);
             likeSum = (TextView) itemView.findViewById(R.id.like_sum);
+            videoLayout = (RelativeLayout) itemView.findViewById(R.id.video_layout);
+            imgsLayout = (GridLayout) itemView.findViewById(R.id.imgs_layout);
+            likeLayout = (LinearLayout) itemView.findViewById(R.id.like_layout);
 //            videoView = (RelativeLayout) itemView.findViewById(R.id.player_view);
             dataLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -387,6 +396,10 @@ public class PostsFragment extends Fragment implements onRefreshListener {
                 }
             });
 
+        }
+
+        public void bindPost(final Post post) {
+            this.post = post;
             likeState.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -478,14 +491,45 @@ public class PostsFragment extends Fragment implements onRefreshListener {
                     }
                 }
             });
-        }
-
-        public void bindPost(final Post post) {
-            this.post = post;
             likeSum.setText(String.valueOf(post.getLikersSum()));
             postSubject.setText(post.getSubject());
             String dateString = post.getTimeStamp();
             Date date = new Date();
+            if (post.getVideoPath() != null) {
+                videoLayout.setVisibility(View.VISIBLE);
+                String videoPath = post.getVideoPath().toString();
+                PlayerView video = new PlayerView(getActivity(), videoLayout)
+                        .setTitle("Video")
+                        .setScaleType(PlayStateParams.fitparent)
+                        .forbidTouch(false)
+                        .hideMenu(true)
+                        .setPlaySource(videoPath);
+            }
+
+            if (post.getImgsPath() != null) {
+                imgsLayout.setVisibility(View.VISIBLE);
+                final ArrayList<String> path = post.getImgsPath();
+                imgsLayout.removeAllViews();
+                for (int i = 0; i < path.size(); i++) {
+                    final int idx = i;
+                    ImageView img = new ImageView(getActivity());
+                    GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+                    params.height = 128;
+                    params.width = 64;
+                    params.leftMargin = params.topMargin = params.bottomMargin = params.rightMargin = 10;
+                    img.setLayoutParams(params);
+                    imgsLayout.addView(img);
+                    img.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = ImageActivity.newIntent(getActivity());
+                            intent.putExtra(Constant.IMAGE_PATH, path.get(idx));
+                            startActivity(intent);
+                        }
+                    });
+                    ImageLoader.getInstance().displayImage(path.get(i), img);
+                }
+            }
             try {
                 date = psdf.parse(dateString);
             } catch (ParseException e) {
@@ -499,18 +543,18 @@ public class PostsFragment extends Fragment implements onRefreshListener {
 //                    }
             dateString = sdf.format(date);
             postDate.setText(dateString);
-            if (post.getImgsPath().size() > 0 || post.getVideoPath() != null) {
-                hintLayout.setVisibility(View.VISIBLE);
-                if (post.getImgsPath().size() > 0) {
-                    hintLayout.setBackgroundColor(getActivity().getResources()
-                            .getColor(R.color.white));
-                    hintText.setText(post.getImgsPath().size() + "+");
-                    ImageLoader.getInstance().displayImage(
-                            post.getImgsPath().get(0), imgFirst);
-                } else {
-                    hintText.setText("Video+");
-                }
-            }
+//            if (post.getImgsPath().size() > 0 || post.getVideoPath() != null) {
+//                hintLayout.setVisibility(View.VISIBLE);
+//                if (post.getImgsPath().size() > 0) {
+//                    hintLayout.setBackgroundColor(getActivity().getResources()
+//                            .getColor(R.color.white));
+//                    hintText.setText(post.getImgsPath().size() + "+");
+//                    ImageLoader.getInstance().displayImage(
+//                            post.getImgsPath().get(0), imgFirst);
+//                } else {
+//                    hintText.setText("Video+");
+//                }
+//            }
 //            ImageLoader.getInstance().displayImage(user.getGravatarURL(), posterIcon);
 //            posterName.setText(user.getUsername());
 //            if (user.getLocation() != null) {
@@ -595,6 +639,31 @@ public class PostsFragment extends Fragment implements onRefreshListener {
 //                    String date = "Unknown Date";
 //                    postDate.setText(date);
                     }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                        super.onSuccess(statusCode, headers, response);
+                    }
+
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                        super.onSuccess(statusCode, headers, responseString);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                        super.onFailure(statusCode, headers, throwable, errorResponse);
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        super.onFinish();
+                    }
                 });
 //            } else {
 //            }
@@ -649,6 +718,9 @@ public class PostsFragment extends Fragment implements onRefreshListener {
 
         @Override
         public void onBindViewHolder(PostHolder holder, int position) {
+            holder.imgsLayout.setVisibility(View.GONE);
+            holder.videoLayout.setVisibility(View.GONE);
+            holder.likeState.setVisibility(View.GONE);
             holder.bindPost(posts.get(position));
         }
 
@@ -672,6 +744,10 @@ public class PostsFragment extends Fragment implements onRefreshListener {
         public void onViewRecycled(PostHolder holder) {
             super.onViewRecycled(holder);
             ImageLoader.getInstance().cancelDisplayTask(holder.posterIcon);
+            for (int i = 0; i < holder.imgsLayout.getChildCount(); i++) {
+                ImageLoader.getInstance().cancelDisplayTask((ImageView) holder.imgsLayout
+                    .getChildAt(i));
+            }
         }
 
         private void setPosts (ArrayList<Post> posts) {
@@ -691,7 +767,7 @@ public class PostsFragment extends Fragment implements onRefreshListener {
         @Override
         public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
             if (parent.getChildPosition(view) != -1) {
-                outRect.top = space + 4;
+                outRect.top = space;
                 outRect.right = space;
                 outRect.left = space;
             }

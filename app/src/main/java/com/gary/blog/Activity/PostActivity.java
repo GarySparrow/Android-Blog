@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -38,12 +37,12 @@ import com.gary.blog.Data.Comment;
 import com.gary.blog.Data.Post;
 import com.gary.blog.Data.User;
 import com.gary.blog.Dialog.LoadingDialog;
+import com.gary.blog.Notifications.NotifiactionsManager;
 import com.gary.blog.R;
 import com.gary.blog.Utils.JsonUtil;
 import com.gary.blog.WebService.BaseClient;
 import com.gary.blog.Wedgit.CircleImage;
 import com.gary.blog.Wedgit.MyRecyclerView;
-import com.gary.blog.Wedgit.MyRefreshLayout;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -64,6 +63,7 @@ import static com.gary.blog.Constant.FAILURE;
 import static com.gary.blog.Constant.SUCCESS;
 import static com.gary.blog.Constant.psdf;
 import static com.gary.blog.Constant.sdf;
+import static com.gary.blog.Constant.user;
 
 /**
  * Created by hasee on 2016/12/16.
@@ -72,17 +72,17 @@ import static com.gary.blog.Constant.sdf;
 public class PostActivity extends AppCompatActivity{
 
     private static final String TAG = "PostActivity";
-    private static final int EDIT = R.id.edit_post;
-    private static final int DONE = R.id.edit_done;
+//    private static final int EDIT = R.id.edit_post;
+//    private static final int DONE = R.id.edit_done;
 
     private GridLayout imgsLayout;
     private LinearLayout emptyView;
     private CircleImage posterIcon;
     private TextView posterName, postTime, toolbarText;
-    private MyRefreshLayout refreshLayout;
+//    private MyRefreshLayout refreshLayout;
     private EditText postSubject;
     private MyRecyclerView recyclerView;
-    private TextView newComment;
+//    private TextView newComment;
     private Menu menu;
     private LinearLayout posterLayout;
     private RelativeLayout videoView;
@@ -93,13 +93,13 @@ public class PostActivity extends AppCompatActivity{
     private CommentAdapter commentAdapter;
     private adapterObserver observer;
 
-    private SwipeRefreshLayout.OnRefreshListener listener;
+//    private SwipeRefreshLayout.OnRefreshListener listener;
 
     private User poster;
     private Post post;
-    private ArrayList<Comment> comments;
-    private boolean isRefresh;
-    private String preSubject;
+//    private ArrayList<Comment> comments;
+//    private boolean isRefresh;
+//    private String preSubject;
 
     private Handler handler = new Handler() {
         @Override
@@ -280,7 +280,7 @@ public class PostActivity extends AppCompatActivity{
         floatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Constant.user == null) {
+                if (user == null) {
                     Message msg = new Message();
                     msg.what = Constant.Toast;
                     msg.obj = new String("尚未登录...");
@@ -311,7 +311,7 @@ public class PostActivity extends AppCompatActivity{
                             return ;
                         }
                         RequestParams params = new RequestParams();
-                        params.put("author_id", Constant.user.getId());
+                        params.put("author_id", user.getId());
                         params.put("body", s);
                         BaseClient.postAbs(post.getCommentsURL(), params, new JsonHttpResponseHandler() {
                             Boolean code;
@@ -334,6 +334,17 @@ public class PostActivity extends AppCompatActivity{
                                 msg.obj = new String("发布成功!");
                                 msg.what = Constant.Toast;
                                 handler.sendMessage(msg);
+
+                                User author = null;
+                                try {
+                                    author = JsonUtil.getEntity(
+                                            response.getString("post_author"), User.class);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                NotifiactionsManager.pushSingleAccount(author.getEmail(),
+                                        new com.gary.blog.Notifications.Message().newCommentMessage());
+
                             }
 
                             @Override
@@ -734,7 +745,7 @@ public class PostActivity extends AppCompatActivity{
 //                        + "\"author_id\": " + Constant.user.getId()
 //                        + "}";
                 RequestParams params = new RequestParams();
-                params.put("author_id", Constant.user.getId());
+                params.put("author_id", user.getId());
                 params.put("body", subject.getText().toString());
                 BaseClient.postAbs(post.getCommentsURL(), params, new JsonHttpResponseHandler() {
                     Boolean code;

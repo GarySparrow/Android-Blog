@@ -123,7 +123,7 @@ public class UserInfoActivity extends AppCompatActivity{
                     upParams.put("location", locationText.getText().toString());
                     upParams.put("about_me", aboutmeText.getText().toString());
                     upParams.put("name", nameText.getText().toString());
-                    BaseClient.post("update_info/" + Constant.user.getId() + "/",
+                    BaseClient.post("UPDATE_INFO" + Constant.user.getId() + "/",
                             upParams, new JsonHttpResponseHandler() {
                                 boolean code = false;
 
@@ -139,6 +139,9 @@ public class UserInfoActivity extends AppCompatActivity{
                                     if (code) {
                                         Toast.makeText(UserInfoActivity.this, "修改成功!",
                                                 Toast.LENGTH_SHORT).show();
+                                        Constant.user.setLocation(locationText.getText().toString());
+                                        Constant.user.setAboutMe(aboutmeText.getText().toString());
+                                        Constant.user.setName(nameText.getText().toString());
                                     } else {
                                         Toast.makeText(UserInfoActivity.this, "修改失败...",
                                                 Toast.LENGTH_SHORT).show();

@@ -15,7 +15,7 @@
         android:src="@drawable/default_icon"
         android:id="@+id/user_icon"/>
 
-    <!--<com.gary.bolg.Wedgit.CircleImage-->
+    <!--<com.gary.blog.Wedgit.CircleImage-->
         <!--android:layout_width="100dp"-->
         <!--android:layout_height="100dp"-->
         <!--android:src="@mipmap/ic_launcher"-->

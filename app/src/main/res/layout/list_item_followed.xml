@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
+    android:layout_height="match_parent"
     android:id="@+id/card_layout"
     app:cardCornerRadius="12dp"
     app:cardElevation="4dp"
@@ -103,13 +103,70 @@
 
             <TextView
                 android:id="@+id/followed_subject"
-                android:gravity="center"
+                android:gravity="center_horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
-                android:text="    nothing..."
+                android:text="nothing..."
                 android:textColor="@color/colorPrimary"
                 android:textSize="26sp" />
+
+            <GridLayout
+                android:rowCount="3"
+                android:columnCount="3"
+                android:layout_below="@id/post_subject"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_margin="12dp"
+                android:id="@+id/imgs_layout"
+                android:visibility="gone">
+
+            </GridLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:id="@+id/video_layout"
+                android:layout_margin="12dp"
+                android:visibility="gone">
+
+                <include
+                    layout="@layout/simple_player_view_player"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="right|bottom"
+                android:layout_gravity="right|bottom"
+                android:id="@+id/like_layout">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    android:textSize="18sp"
+                    android:id="@+id/like_sum"
+                    android:text=""/>
+
+                <com.sackcentury.shinebuttonlib.ShineButton
+                    android:id="@+id/like_state"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginLeft="4dp"
+                    app:allow_random_color="true"
+                    app:btn_color="@color/gray_btn_bg_color"
+                    app:btn_fill_color="@color/red_btn_bg_color"
+                    app:enable_flashing="true"
+                    android:visibility="gone"
+                    app:shine_turn_angle="20"
+                    app:siShape="@raw/like" />
+
+            </LinearLayout>
 
         </com.gary.blog.Wedgit.MyLinearLayout>
 
@@ -126,15 +183,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/default_icon"
-                android:layout_weight="1"
                 android:layout_gravity="center"
-                android:layout_margin="12dp"
+                android:layout_margin="36dp"
                 android:id="@+id/followed_icon"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="User Name"
                 android:textColor="@color/black"
                 android:textSize="30sp"

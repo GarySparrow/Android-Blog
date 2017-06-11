@@ -17,7 +17,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Explode;
 import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,7 +29,10 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.gary.blog.Constant;
+import com.gary.blog.Data.User;
+import com.gary.blog.Notifications.NotifiactionsManager;
 import com.gary.blog.R;
+import com.gary.blog.Utils.JsonUtil;
 import com.gary.blog.WebService.BaseClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -40,6 +42,7 @@ import com.yuyh.library.imgsel.ImgSelActivity;
 import com.yuyh.library.imgsel.ImgSelConfig;
 
 import org.apache.http.Header;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -49,9 +52,11 @@ import java.util.ArrayList;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
+
 import static com.gary.blog.Constant.FAILURE;
 import static com.gary.blog.Constant.POSTS;
 import static com.gary.blog.Constant.SUCCESS;
+import static com.gary.blog.Constant.user;
 
 /**
  * Created by hasee on 2016/12/18.
@@ -59,6 +64,8 @@ import static com.gary.blog.Constant.SUCCESS;
 
 public class WritePostActivity extends AppCompatActivity{
 
+
+    private static final String TAG = "WritePostActivity";
     private final static int MESSAGE_VIDEO = 1;
     private final static int REQUEST_IMG = 2;
 
@@ -118,7 +125,7 @@ public class WritePostActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write_post);
 
-        getWindow().setEnterTransition(new Explode().setDuration(500));
+//        getWindow().setEnterTransition(new Explode().setDuration(500));
 
         videoLayout = (LinearLayout) findViewById(R.id.video_layout);
         videoButton = (FloatingActionButton) findViewById(R.id.video_add);
@@ -139,6 +146,7 @@ public class WritePostActivity extends AppCompatActivity{
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         init();
         initImageSelector();
+
     }
 
     private void initImageSelector (){
@@ -305,7 +313,7 @@ public class WritePostActivity extends AppCompatActivity{
             case R.id.edit_done:
                 RequestParams params = new RequestParams();
                 params.put("body", postSubject.getText().toString());
-                params.put("author_id", Constant.user.getId());
+                params.put("author_id", user.getId());
                 if (video != null) {
                     try {
                         params.put("video", video);
@@ -348,6 +356,17 @@ public class WritePostActivity extends AppCompatActivity{
                         msg.what = Constant.NewPost;
                         msg.arg1 = Constant.SUCCESS;
                         handler.sendMessage(msg);
+                        ArrayList<User> users = null;
+                        try {
+                            users = JsonUtil.getEntityList(
+                                    response.getString("followers"), User.class);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        for(User user : users) {
+                            NotifiactionsManager.pushSingleAccount(user.getEmail(),
+                                    new com.gary.blog.Notifications.Message().newPostMessage());
+                        }
                     }
 
                     @Override
