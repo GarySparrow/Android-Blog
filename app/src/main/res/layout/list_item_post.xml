@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:gravity="center_vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!--<android.support.v7.widget.CardView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginBottom="15dp"-->
+        <!--android:layout_marginLeft="15dp"-->
+        <!--android:layout_marginRight="15dp"-->
+        <!--android:layout_marginTop="15dp"-->
+        <!--app:cardCornerRadius="4dp">-->
+    
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/data_layout"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:id="@+id/post_head">
+
+                <com.gary.blog.Wedgit.CircleImage
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:id="@+id/poster_icon"
+                    android:src="@drawable/default_icon"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_gravity="center"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="15dp"
+                    android:gravity="center|left">
+
+                    <TextView
+                        android:id="@+id/poster_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
+                        android:layout_marginLeft="8dp"
+                        android:gravity="center"
+                        android:text="name"
+                        android:textColor="@color/black"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/post_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/poster_name"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginBottom="4dp"
+                        android:gravity="center"
+                        android:text="date"
+                        android:textColor="@color/gray"
+                        android:textSize="14sp" />
+
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/post_head">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="4dp"
+                    android:id="@+id/text_layout">
+
+                    <TextView
+                        android:id="@+id/poster_loc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="From Unknow Space"
+                        android:textColor="@color/gray"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:id="@+id/post_subject"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/poster_loc"
+                        android:ellipsize="end"
+                        android:text="nothing"
+                        android:textColor="@color/colorPrimary"
+                        android:textSize="16sp" />
+
+                    <GridLayout
+                        android:rowCount="3"
+                        android:columnCount="3"
+                        android:layout_below="@id/post_subject"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/imgs_layout"
+                        android:visibility="gone">
+
+                    </GridLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginRight="36dp"
+                        android:layout_below="@id/post_subject"
+                        android:id="@+id/video_layout"
+                        android:visibility="gone">
+
+                        <include
+                            layout="@layout/simple_player_view_player"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                    </RelativeLayout>
+
+
+                </RelativeLayout>
+
+
+                <!--<FrameLayout-->
+                    <!--android:layout_width="50dp"-->
+                    <!--android:layout_height="80dp"-->
+                    <!--android:gravity="center"-->
+                    <!--android:layout_below="@id/text_layout"-->
+                    <!--android:background="@color/gray_btn_bg_color"-->
+                    <!--android:visibility="gone"-->
+                    <!--android:id="@+id/hint_layout">-->
+
+                    <!--<ImageView-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:id="@+id/img_first"/>-->
+
+                    <!--<TextView-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:text=""-->
+                        <!--android:layout_gravity="center"-->
+                        <!--android:textColor="@color/black"-->
+                        <!--android:id="@+id/hint_text"/>-->
+
+                <!--</FrameLayout>-->
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:gravity="left|center"
+                    android:id="@+id/like_layout">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="bottom"
+                        android:textSize="18sp"
+                        android:id="@+id/like_sum"
+                        android:text=""/>
+
+                    <com.sackcentury.shinebuttonlib.ShineButton
+                        android:id="@+id/like_state"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_marginLeft="4dp"
+                        app:allow_random_color="true"
+                        app:btn_color="@color/gray_btn_bg_color"
+                        app:btn_fill_color="@color/red_btn_bg_color"
+                        app:enable_flashing="true"
+                        android:visibility="gone"
+                        app:shine_turn_angle="20"
+                        app:siShape="@raw/like" />
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    <!--</android.support.v7.widget.CardView>-->
+
+
+    <!--<RelativeLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="150dp"-->
+        <!--android:id="@+id/player_view"-->
+        <!--android:visibility="gone"-->
+        <!--android:layout_below="@id/data_layout">-->
+
+        <!--<include-->
+            <!--layout="@layout/simple_player_view_player"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--&gt;</include>-->
+
+    <!--</RelativeLayout>-->
+
+
+
+</RelativeLayout>
